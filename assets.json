@@ -1,0 +1,7 @@
+{
+  "hero": "assets/hero.glb",
+  "enemy": "assets/enemy.glb",
+  "boss": "assets/boss.glb",
+  "basement": "assets/basement.glb",
+  "props": "assets/props.glb"
+}
