@@ -32,15 +32,20 @@
     .resource-caption{font-size:10px;color:var(--muted);font-weight:400;margin-left:-2px;letter-spacing:.05em}
     .hud-center{position:absolute;left:50%;top:27px;transform:translateX(-50%);text-align:center;width:270px}
     #roomLabel{font-size:15px;letter-spacing:.16em;line-height:1.45;font-weight:700}
-    #map{display:flex;justify-content:center;align-items:center;gap:0;margin-top:12px}
-    #map:before,#map:after{content:"";width:24px;height:1px;background:var(--line);margin:0 11px}
-    #map [data-room]{position:relative;display:inline-flex;justify-content:center;align-items:center;width:25px;height:20px;border:1px solid rgba(237,226,206,.26);background:rgba(15,12,10,.5);color:#8d7c69;font-size:10px;line-height:1;transition:color .25s,border-color .25s,background .25s}
-    #map [data-room]+[data-room]{margin-left:12px}
-    #map [data-room]+[data-room]:before{position:absolute;left:-13px;top:8px;width:12px;height:1px;content:"";background:var(--line)}
-    #map .active,#map .current,#map [aria-current="true"]{background:var(--cream);color:#2b211b;border-color:var(--cream);box-shadow:0 0 12px rgba(237,226,206,.12);text-shadow:none}
-    #map .complete,#map .visited,#map .cleared{color:var(--blue);border-color:rgba(131,213,229,.6)}
+    #map{display:grid;justify-content:center;gap:4px;margin-top:10px}
+    #bigMap{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:4;display:grid;gap:7px;padding:26px 30px;background:rgba(16,12,10,.92);border:1px solid rgba(219,183,116,.45);box-shadow:0 24px 70px rgba(0,0,0,.55);pointer-events:none}
+    #map .cell,#bigMap .cell{display:flex;justify-content:center;align-items:center;border:1px solid rgba(237,226,206,.16);background:rgba(15,12,10,.42);color:#8d7c69;line-height:1;transition:color .25s,border-color .25s,background .25s}
+    #map .cell{width:22px;height:17px;font-size:10px}
+    #bigMap .cell{width:46px;height:36px;font-size:17px}
+    #map .cell.void,#bigMap .cell.void{border-color:transparent;background:transparent}
+    #map .cell.known,#bigMap .cell.known{border-color:rgba(237,226,206,.34)}
+    #map .cell.cleared,#bigMap .cell.cleared{color:var(--blue);border-color:rgba(131,213,229,.6)}
+    #map .cell.boss:not(.active),#bigMap .cell.boss:not(.active){color:var(--red);border-color:rgba(239,116,96,.55)}
+    #map .cell.shop:not(.active),#bigMap .cell.shop:not(.active){color:var(--gold);border-color:rgba(219,183,116,.55)}
+    #map .cell.golden:not(.active),#bigMap .cell.golden:not(.active){color:var(--gold);border-color:rgba(219,183,116,.75);background:rgba(88,66,30,.35)}
+    #map .cell.active,#bigMap .cell.active{background:var(--cream);color:#2b211b;border-color:var(--cream);box-shadow:0 0 12px rgba(237,226,206,.12)}
     .hud-right{position:absolute;right:30px;top:28px;min-width:244px;max-width:340px;text-align:right}
-    .stats{display:flex;justify-content:flex-end;gap:22px;font-size:13px;font-weight:700;white-space:nowrap}
+    .stats{display:flex;justify-content:flex-start;gap:22px;margin-top:10px;font-size:13px;font-weight:700;white-space:nowrap}
     .stat{display:flex;align-items:center;gap:8px}
     .stat-name{font-size:10px;color:var(--muted);font-weight:400}
     .tear-icon{display:inline-block;width:10px;height:13px;background:var(--blue);border-radius:70% 35% 65% 60%;transform:rotate(-32deg);box-shadow:inset -2px -2px 0 rgba(27,63,75,.35)}
@@ -112,16 +117,16 @@
         <div class="resource" title="코인"><span class="coin-icon" aria-hidden="true">I</span><span id="coins">0</span><span class="resource-caption">코인</span></div>
         <div class="resource" title="열쇠"><span class="key-icon" aria-hidden="true"></span><span id="keys">0</span><span class="resource-caption">열쇠</span></div>
       </div>
-    </div>
-    <div class="hud-center">
-      <div id="roomLabel">지하실 입구</div>
-      <div id="map" aria-label="방 진행"><span data-room="0" class="active" title="첫 번째 방">1</span><span data-room="1" title="두 번째 방">2</span><span data-room="2" title="세 번째 방">3</span></div>
-    </div>
-    <div class="hud-right">
       <div class="stats">
         <span class="stat"><i class="tear-icon" aria-hidden="true"></i><span class="stat-name">공격력</span><span id="damage">—</span></span>
         <span class="stat"><span class="stat-name">눈물/초</span><span id="rate">—</span></span>
       </div>
+    </div>
+    <div class="hud-center">
+      <div id="roomLabel">지하실 입구</div>
+      <div id="map" aria-label="방 진행"></div>
+    </div>
+    <div class="hud-right">
       <div id="objective">눈물로 길을 열고, 지하실을 벗어나세요.</div>
     </div>
     <div id="bossHud" hidden>
@@ -136,23 +141,25 @@
         <span class="control-pair"><kbd>↑ ← ↓ →</kbd> 사격</span>
         <span class="control-pair mouse-help">또는 마우스 조준 · 누르기</span>
         <span class="control-pair"><kbd>E</kbd> 상호작용</span>
+        <span class="control-pair"><kbd>Tab</kbd> 지도</span>
       </div>
       <div class="bottom-right"><span id="timer">00:00</span><button id="muteButton" class="utility" type="button" aria-label="소리 켜고 끄기" title="소리 켜고 끄기">소리 켬</button><button id="pauseButton" class="utility" type="button" aria-label="일시정지" title="Esc · 일시정지">Ⅱ 정지</button></div>
     </div>
   </div>
   <div id="reticle" hidden aria-hidden="true"></div>
+  <div id="bigMap" hidden aria-label="확대 지도"></div>
   <div id="overlay" role="dialog" aria-modal="true" aria-labelledby="overlayTitle" aria-describedby="overlayText">
     <div class="overlay-card">
       <div id="overlayTag">A WAY OUT, ONE TEAR AT A TIME</div>
       <h1 id="overlayTitle">Escape<br>basement</h1>
       <div class="title-rule" aria-hidden="true"><i class="tear-icon"></i></div>
       <p id="overlayText">작은 눈물로, 어두운 방 너머로.
-움직이며 쏘고, 붉은 탄 사이의 틈을 찾으세요.
-보스를 쓰러뜨린 뒤 직접 출구로 나가야 합니다.</p>
+방마다 적을 처치해 문을 열고, 지도를 탐험하세요.
+문지기를 쓰러뜨린 뒤 열리는 균열로 탈출합니다.</p>
       <div id="overlayStats"></div>
       <div class="overlay-actions"><button id="startButton" type="button" disabled>지하실 들어가기</button><button id="secondaryButton" type="button" hidden>처음 화면으로</button></div>
       <div id="loading" role="status">지하실을 준비하고 있습니다…</div>
-      <div class="intro-controls"><span class="control-pair"><kbd>W A S D</kbd> 이동</span><span class="control-pair"><kbd>방향키</kbd> 사격</span><span class="control-pair"><kbd>E</kbd> 상호작용</span><span class="control-pair"><kbd>Esc</kbd> 일시정지</span></div>
+      <div class="intro-controls"><span class="control-pair"><kbd>W A S D</kbd> 이동</span><span class="control-pair"><kbd>방향키</kbd> 사격</span><span class="control-pair"><kbd>E</kbd> 상호작용</span><span class="control-pair"><kbd>Tab</kbd> 확대 지도</span><span class="control-pair"><kbd>Esc</kbd> 일시정지</span></div>
       <p class="credit">오예준 · 1학년 5반 12번</p>
     </div>
   </div>
