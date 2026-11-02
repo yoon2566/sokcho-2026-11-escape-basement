@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "addedOn": "2026-11-02",
+  "studentNumber": 11,
+  "sourceStudentNumber": 11,
+  "status": "assets_only_not_integrated",
+  "warning": "게임 조작, 외형 변형, 충돌 및 재시작은 실제 게임에 연결한 후 확인해야 합니다.",
+  "models": [
+    {
+      "file": "hero.glb",
+      "bytes": 1792504,
+      "sha256": "5d0c02c132260bd4ea8b44bf87be1baae08a7525220bbafbcb673375020bdd27",
+      "skins": 1,
+      "joints": 18,
+      "animations": [
+        "Death",
+        "Hit",
+        "Idle",
+        "Move",
+        "MoveAim",
+        "TearFire"
+      ],
+      "meshOrigin": "Hunyuan-derived; some first-person equipment may include previous supporting geometry",
+      "rigAndMotionOrigin": "Hunyuan and/or Blender supplemental rig; includes Blender-authored animation",
+      "runtimeIntegrated": false
+    }
+  ]
+}
